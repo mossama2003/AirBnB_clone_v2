@@ -1,16 +1,15 @@
 #!/usr/bin/python3
 """ new class for sqlAlchemy """
-from os import getenv
-from sqlalchemy.orm import sessionmaker, scoped_session
 from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
-from models.base_model import Base
+from sqlalchemy.orm import sessionmaker, scoped_session
+from models.base_model import Base, BaseModel
 from models.state import State
 from models.city import City
 from models.user import User
 from models.place import Place
 from models.review import Review
 from models.amenity import Amenity
+from os import getenv
 
 
 class DBStorage:
@@ -20,7 +19,7 @@ class DBStorage:
     __session = None
 
     def __init__(self):
-        """constructor"""
+        """create a new engine"""
         self.__engine = create_engine(
             "mysql+mysqldb://{}:{}@{}/{}".format(
                 getenv("HBNB_MYSQL_USER"),
@@ -39,15 +38,15 @@ class DBStorage:
             returns a dictionary of __object
         """
         if cls is None:
-            objs = self.__session.query(State).all()
-            objs += self.__session.query(City).all()
-            objs += self.__session.query(User).all()
-            objs += self.__session.query(Place).all()
-            objs += self.__session.query(Review).all()
-            objs += self.__session.query(Amenity).all()
+            obj = self.__session.query(State).all()
+            obj += self.__session.query(City).all()
+            obj += self.__session.query(User).all()
+            obj += self.__session.query(Place).all()
+            obj += self.__session.query(Review).all()
+            obj += self.__session.query(Amenity).all()
         else:
-            objs = self.__session.query(cls).all()
-        return {obj.id: obj for obj in objs}
+            obj = self.__session.query(cls).all()
+        return {obj.id: obj for obj in obj} if obj else {}
 
     def new(self, obj):
         """add a new element in the table"""
@@ -61,9 +60,11 @@ class DBStorage:
         self.__session.commit()
 
     def delete(self, obj=None):
-        """delete an element in the table"""
+        """delete object"""
         if obj:
             self.__session.delete(obj)
+            self.__session.flush()
+            self.__session.refresh(obj)
 
     def reload(self):
         """configuration"""
