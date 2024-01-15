@@ -53,6 +53,8 @@ class DBStorage:
         """add a new element in the table"""
         if obj:
             self.__session.add(obj)
+            self.__session.flush()
+            self.__session.refresh(obj)
 
     def save(self):
         """save changes"""
@@ -66,8 +68,8 @@ class DBStorage:
     def reload(self):
         """configuration"""
         Base.metadata.create_all(self.__engine)
-        sec = sessionmaker(bind=self.__engine, expire_on_commit=False)
-        Session = scoped_session(sec)
+        sess = sessionmaker(bind=self.__engine, expire_on_commit=False)
+        Session = scoped_session(sess)
         self.__session = Session()
 
     def close(self):
