@@ -1,12 +1,10 @@
 #!/usr/bin/python3
 """This is the state class"""
-from sqlalchemy.ext.declarative import declarative_base
-from models.base_model import BaseModel, Base
-from sqlalchemy.orm import relationship
-from sqlalchemy import Column, Integer, String
-import models
-from models.city import City
 import os
+from models.base_model import BaseModel, Base
+from sqlalchemy import Column, String
+from models.city import City
+from sqlalchemy.orm import relationship
 
 
 class State(BaseModel, Base):
@@ -17,16 +15,19 @@ class State(BaseModel, Base):
 
     __tablename__ = "states"
     name = Column(String(128), nullable=False)
+    cities = relationship("City", backref="state", cascade="delete")
     if os.getenv("HBNB_TYPE_STORAGE") == "db":
-        cities = relationship("City", backref="state", cascade="all, delete-orphan")
+        cities = relationship("City", backref="state")
     else:
 
         @property
         def cities(self):
-            """Returns the list of City instances with state_id equals
+            """Returns the list of City instances with state_id equals""
             to the current State.id"""
+            from models import storage
+
             city_list = []
-            for city in list(models.storage.all(City).values()):
+            for city in storage.all(City).values():
                 if city.state_id == self.id:
                     city_list.append(city)
             return city_list
