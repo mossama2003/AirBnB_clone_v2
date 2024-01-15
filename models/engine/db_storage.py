@@ -20,45 +20,49 @@ class DBStorage:
     __session = None
 
     def __init__(self):
-        """creates engine"""
         user = getenv("HBNB_MYSQL_USER")
-        password = getenv("HBNB_MYSQL_PWD")
-        host = getenv("HBNB_MYSQL_HOST")
+        passwd = getenv("HBNB_MYSQL_PWD")
         db = getenv("HBNB_MYSQL_DB")
+        host = getenv("HBNB_MYSQL_HOST")
         env = getenv("HBNB_ENV")
+
         self.__engine = create_engine(
-            "mysql+mysqldb://{}:{}@{}/{}".format(user, password, host, db),
+            "mysql+mysqldb://{}:{}@{}/{}".format(user, passwd, host, db),
             pool_pre_ping=True,
         )
+
         if env == "test":
             Base.metadata.drop_all(self.__engine)
-        else:
-            Base.metadata.create_all(self.__engine)
 
     def all(self, cls=None):
         """returns a dictionary
         Return:
             returns a dictionary of __object
         """
-        if cls is None:
-            all_obj = self.__session.query(State).all()
-            all_obj += self.__session.query(City).all()
-            all_obj += self.__session.query(User).all()
-            all_obj += self.__session.query(Place).all()
-            all_obj += self.__session.query(Review).all()
-            all_obj += self.__session.query(Amenity).all()
+        dic = {}
+        if cls:
+            if type(cls) is str:
+                cls = eval(cls)
+            query = self.__session.query(cls)
+            for elem in query:
+                key = "{}.{}".format(type(elem).__name__, elem.id)
+                dic[key] = elem
         else:
-            all_obj = self.__session.query(cls).all()
-        return {obj.id: obj for obj in all_obj}
+            lista = [State, City, User, Place, Review, Amenity]
+            for clase in lista:
+                query = self.__session.query(clase)
+                for elem in query:
+                    key = "{}.{}".format(type(elem).__name__, elem.id)
+                    dic[key] = elem
+        return dic
 
     def new(self, obj):
         """add a new element in the table"""
-        if obj is not None:
-            self.__session.add(obj)
+        self.__session.add(obj)
 
     def save(self):
         """save changes"""
-        return self.__session.commit()
+        self.__session.commit()
 
     def delete(self, obj=None):
         """delete an element in the table"""
