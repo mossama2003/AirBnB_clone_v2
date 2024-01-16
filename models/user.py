@@ -16,39 +16,18 @@ class User(BaseModel, Base):
     """
 
     __tablename__ = "users"
-    email = Column(String(128), nullable=False)
-    password = Column(String(128), nullable=False)
-    first_name = Column(String(128))
-    last_name = Column(String(128))
-    places = relationship("Place", backref="user", cascade="delete")
-    reviews = relationship("Review", backref="user", cascade="delete")
     if os.getenv("HBNB_TYPE_STORAGE") == "db":
-        places = relationship("Place", backref="user")
-        reviews = relationship("Review", backref="user")
+        email = Column(String(128), nullable=False)
+        password = Column(String(128), nullable=False)
+        first_name = Column(String(128), nullable=True)
+        last_name = Column(String(128), nullable=True)
+        places = relationship("Place", backref="user", cascade="all, delete-orphan")
+        reviews = relationship("Review", backref="user", cascade="all, delete-orphan")
+
     else:
+        email = ""
+        password = ""
+        first_name = ""
+        last_name = ""
         places = []
         reviews = []
-
-        @property
-        def places(self):
-            """Returns the list of Place instances with user_id equals
-            to the current User.id"""
-            from models import storage
-
-            place_list = []
-            for place in storage.all(Place).values():
-                if place.user_id == self.id:
-                    place_list.append(place)
-            return place_list
-
-        @property
-        def reviews(self):
-            """Returns the list of Review instances with user_id equals
-            to the current User.id"""
-            from models import storage
-
-            review_list = []
-            for review in storage.all(Review).values():
-                if review.user_id == self.id:
-                    review_list.append(review)
-            return review_list

@@ -1,15 +1,13 @@
 #!/usr/bin/python3
 """This is the place class"""
 from models.base_model import BaseModel, Base
-from models.review import Review
-from models.amenity import Amenity
-
 from sqlalchemy import Column, Table, String, Integer, Float, ForeignKey
 from sqlalchemy.orm import relationship
+from models.amenity import Amenity
+from models.review import Review
 from os import getenv
 
-
-place_amenity = Table(
+Place_amenity = Table(
     "place_amenity",
     Base.metadata,
     Column(
@@ -49,61 +47,49 @@ class Place(BaseModel, Base):
     city_id = Column(String(60), ForeignKey("cities.id"), nullable=False)
     user_id = Column(String(60), ForeignKey("users.id"), nullable=False)
     name = Column(String(128), nullable=False)
-    description = Column(String(1024))
+    description = Column(String(1024), nullable=True)
     number_rooms = Column(Integer, nullable=False, default=0)
     number_bathrooms = Column(Integer, nullable=False, default=0)
     max_guest = Column(Integer, nullable=False, default=0)
     price_by_night = Column(Integer, nullable=False, default=0)
-    latitude = Column(Float)
-    longitude = Column(Float)
-    amenity_ids = []
-    reviews = relationship("Review", backref="place", cascade="delete")
-    amenities = relationship(
-        "Amenity",
-        secondary="place_amenity",
-        viewonly=False,
-        backref="place_amenities",
-        cascade="delete",
-    )
+    latitude = Column(Float, nullable=True)
+    longitude = Column(Float, nullable=True)
     if getenv("HBNB_TYPE_STORAGE") == "db":
-        reviews = relationship("Review", backref="place", cascade="delete")
+        reviews = relationship("Review", backref="places", cascade="all, delete-orphan")
         amenities = relationship(
             "Amenity",
             secondary="place_amenity",
             viewonly=False,
-            backref="place_amenities",
-            cascade="delete",
         )
     else:
 
         @property
         def reviews(self):
-            """getter attribute for list of review instances"""
+            """getter attribute for reviews"""
             from models import storage
 
-            review_list = []
-            all_reviews = storage.all(Review)
-            for review in all_reviews.values():
+            reviews = []
+            for review in storage.all(Review).values():
                 if review.place_id == self.id:
-                    review_list.append(review)
-            return review_list
+                    reviews.append(review)
+            return reviews
 
         @property
         def amenities(self):
-            """getter attribute for list of amenity instances"""
+            """getter attribute for amenities"""
             from models import storage
 
-            amenity_list = []
-            all_amenities = storage.all(Amenity)
-            for amenity in all_amenities.values():
-                if amenity.id in self.amenity_ids:
-                    amenity_list.append(amenity)
-            return amenity_list
+            amenities = []
+            for amenity in storage.all(Amenity).values():
+                if amenity.place_id == self.id:
+                    amenities.append(amenity)
+            return amenities
 
-        @amenities.setter
+        @property.setter
         def amenities(self, obj):
-            """setter attribute for list of amenity instances"""
+            """setter attribute for amenities"""
             if type(obj) == Amenity:
                 self.amenity_ids.append(obj.id)
             else:
-                print("Amenity must be an instance of Amenity class")
+                pass
+            return self.amenity_ids
