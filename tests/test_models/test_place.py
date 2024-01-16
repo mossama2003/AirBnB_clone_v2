@@ -10,25 +10,25 @@ class TestPlace(unittest.TestCase):
     """this will test the place class"""
 
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(c):
         """set up for test"""
-        cls.place = Place()
-        cls.place.city_id = "1234-abcd"
-        cls.place.user_id = "4321-dcba"
-        cls.place.name = "Death Star"
-        cls.place.description = "UNLIMITED POWER!!!!!"
-        cls.place.number_rooms = 1000000
-        cls.place.number_bathrooms = 1
-        cls.place.max_guest = 607360
-        cls.place.price_by_night = 10
-        cls.place.latitude = 160.0
-        cls.place.longitude = 120.0
-        cls.place.amenity_ids = ["1324-lksdjkl"]
+        c.place = Place()
+        c.place.city_id = "1234-abcd"
+        c.place.user_id = "4321-dcba"
+        c.place.name = "Death Star"
+        c.place.description = "UNLIMITED POWER!!!!!"
+        c.place.number_rooms = 1000000
+        c.place.number_bathrooms = 1
+        c.place.max_guest = 607360
+        c.place.price_by_night = 10
+        c.place.latitude = 160.0
+        c.place.longitude = 120.0
+        c.place.amenity_ids = ["1324-lksdjkl"]
 
     @classmethod
-    def teardown(cls):
+    def teardown(c):
         """at the end of the test this will tear it down"""
-        del cls.place
+        del c.place
 
     def tearDown(self):
         """teardown"""

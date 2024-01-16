@@ -10,9 +10,9 @@ from models.amenity import Amenity
 import models
 from os import getenv
 
-storage_type = getenv("HBNB_TYPE_STORAGE")
+type_of_storage = getenv("HBNB_TYPE_STORAGE")
 
-if storage_type == "db":
+if type_of_storage == "db":
     place_amenity = Table(
         "place_amenity",
         Base.metadata,
@@ -39,7 +39,7 @@ class Place(BaseModel, Base):
     """
 
     __tablename__ = "places"
-    if storage_type == "db":
+    if type_of_storage == "db":
         city_id = Column(
             String(60),
             ForeignKey("cities.id"),
@@ -117,11 +117,11 @@ class Place(BaseModel, Base):
             to the current Place.id
             """
             reviews = models.storage.all(Review)
-            list_reviews = []
+            reviews_lista = []
             for review in reviews.values():
                 if review.place_id == self.id:
-                    list_reviews.append(review)
-            return list_reviews
+                    reviews_lista.append(review)
+            return reviews_lista
 
         @property
         def amenities(self):
@@ -130,7 +130,7 @@ class Place(BaseModel, Base):
             amenity_ids that contains all Amenity.id linked to the Place
             """
             amenities = models.storage.all(Amenity)
-            list_amenities = []
+            amenities_lista = []
             for amenity in amenities.values():
                 if amenity.id in self.amenity_ids:
-                    list_amenities.append(amenity)
+                    amenities_lista.append(amenity)

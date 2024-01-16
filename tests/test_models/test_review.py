@@ -10,17 +10,17 @@ class TestReview(unittest.TestCase):
     """this will test the place class"""
 
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(c):
         """set up for test"""
-        cls.rev = Review()
-        cls.rev.place_id = "4321-dcba"
-        cls.rev.user_id = "123-bca"
-        cls.rev.text = "The srongest in the Galaxy"
+        c.rev = Review()
+        c.rev.place_id = "4321-dcba"
+        c.rev.user_id = "123-bca"
+        c.rev.text = "The srongest in the Galaxy"
 
     @classmethod
-    def teardown(cls):
+    def teardown(c):
         """at the end of the test this will tear it down"""
-        del cls.rev
+        del c.rev
 
     def tearDown(self):
         """teardown"""

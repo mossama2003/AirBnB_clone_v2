@@ -12,14 +12,14 @@ class TestConsole(unittest.TestCase):
     """Test Suite for the console"""
 
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(c):
         """setup for the test"""
-        cls.consol = HBNBCommand()
+        c.consol = HBNBCommand()
 
     @classmethod
-    def teardown(cls):
+    def teardown(c):
         """at the end of the test this will tear it down"""
-        del cls.consol
+        del c.consol
 
     def tearDown(self):
         """Remove temporary file (file.json) created as a result"""

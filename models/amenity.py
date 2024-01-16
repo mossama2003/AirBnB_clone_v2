@@ -8,7 +8,7 @@ import models
 from sqlalchemy.orm import relationship
 from os import getenv
 
-storage_type = getenv("HBNB_TYPE_STORAGE")
+type_of_storage = getenv("HBNB_TYPE_STORAGE")
 
 
 class Amenity(BaseModel, Base):
@@ -18,7 +18,7 @@ class Amenity(BaseModel, Base):
 
     __tablename__ = "amenities"
     name = Column(String(128), nullable=False)
-    if storage_type == "db":
+    if type_of_storage == "db":
         place_amenities = relationship(
             "Place",
             secondary="place_amenity",
@@ -33,8 +33,8 @@ class Amenity(BaseModel, Base):
             to the current Amenity.id
             """
             amenities = models.storage.all(Amenity)
-            list_amenities = []
+            amenities_lista = []
             for amenity in amenities.values():
                 if amenity.amenity_id == self.id:
-                    list_amenities.append(amenity)
-            return list_amenities
+                    amenities_lista.append(amenity)
+            return amenities_lista

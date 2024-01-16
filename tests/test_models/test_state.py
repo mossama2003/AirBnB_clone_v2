@@ -10,15 +10,15 @@ class TestState(unittest.TestCase):
     """this will test the State class"""
 
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(c):
         """set up for test"""
-        cls.state = State()
-        cls.state.name = "CA"
+        c.state = State()
+        c.state.name = "CA"
 
     @classmethod
-    def teardown(cls):
+    def teardown(c):
         """at the end of the test this will tear it down"""
-        del cls.state
+        del c.state
 
     def tearDown(self):
         """teardown"""

@@ -9,16 +9,16 @@ class TestBaseModel(unittest.TestCase):
     """this will test the base model class"""
 
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(c):
         """setup for the test"""
-        cls.base = BaseModel()
-        cls.base.name = "Kev"
-        cls.base.num = 20
+        c.base = BaseModel()
+        c.base.name = "Kev"
+        c.base.num = 20
 
     @classmethod
-    def teardown(cls):
+    def teardown(c):
         """at the end of the test this will tear it down"""
-        del cls.base
+        del c.base
 
     def tearDown(self):
         """teardown"""

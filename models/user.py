@@ -10,7 +10,7 @@ from sqlalchemy.orm import relationship
 import models
 from os import getenv
 
-storage_type = getenv("HBNB_TYPE_STORAGE")
+type_of_storage = getenv("HBNB_TYPE_STORAGE")
 
 
 class User(BaseModel, Base):
@@ -35,7 +35,7 @@ class User(BaseModel, Base):
         String(128),
         nullable=True,
     )
-    if storage_type == "db":
+    if type_of_storage == "db":
         places = relationship(
             "Place",
             backref="user",
@@ -55,11 +55,11 @@ class User(BaseModel, Base):
             to the current User.id
             """
             places = models.storage.all(Place)
-            list_places = []
+            places_lista = []
             for place in places.values():
                 if place.user_id == self.id:
-                    list_places.append(place)
-            return list_places
+                    places_lista.append(place)
+            return places_lista
 
         @property
         def reviews(self):
@@ -68,8 +68,8 @@ class User(BaseModel, Base):
             to the current User.id
             """
             reviews = models.storage.all(Review)
-            list_reviews = []
+            reviews_lista = []
             for review in reviews.values():
                 if review.user_id == self.id:
-                    list_reviews.append(review)
-            return list_reviews
+                    reviews_lista.append(review)
+            return reviews_lista

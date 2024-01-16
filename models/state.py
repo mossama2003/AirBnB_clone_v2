@@ -10,7 +10,7 @@ from os import getenv
 import models
 
 
-storage_type = getenv("HBNB_TYPE_STORAGE")
+type_of_storage = getenv("HBNB_TYPE_STORAGE")
 
 
 class State(BaseModel, Base):
@@ -20,7 +20,7 @@ class State(BaseModel, Base):
 
     __tablename__ = "states"
     name = Column(String(128), nullable=False)
-    if storage_type == "db":
+    if type_of_storage == "db":
         cities = relationship(
             "City",
             backref="state",
@@ -35,8 +35,8 @@ class State(BaseModel, Base):
             to the current State.id
             """
             cities = models.storage.all(City)
-            list_cities = []
+            cities_lista = []
             for city in cities.values():
                 if city.state_id == self.id:
-                    list_cities.append(city)
-            return list_cities
+                    cities_lista.append(city)
+            return cities_lista

@@ -10,16 +10,16 @@ class TestCity(unittest.TestCase):
     """this will test the city class"""
 
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(c):
         """set up for test"""
-        cls.city = City()
-        cls.city.name = "LA"
-        cls.city.state_id = "CA"
+        c.city = City()
+        c.city.name = "LA"
+        c.city.state_id = "CA"
 
     @classmethod
-    def teardown(cls):
+    def teardown(c):
         """at the end of the test this will tear it down"""
-        del cls.city
+        del c.city
 
     def tearDown(self):
         """teardown"""

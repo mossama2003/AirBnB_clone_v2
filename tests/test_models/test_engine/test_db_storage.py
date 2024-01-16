@@ -14,20 +14,15 @@ class TestDBStorage(unittest.TestCase):
     @classmethod
     def setUpClass(self):
         """set up for test"""
-        self.User = getenv("HBNB_MYSQL_USER")
-        self.Passwd = getenv("HBNB_MYSQL_PWD")
-        self.Db = getenv("HBNB_MYSQL_DB")
-        self.Host = getenv("HBNB_MYSQL_HOST")
         self.db = MySQLdb.connect(
-            host=self.Host,
-            user=self.User,
-            passwd=self.Passwd,
-            db=self.Db,
-            charset="utf8",
+            host=getenv("HBNB_MYSQL_HOST"),
+            port=3306,
+            user=getenv("HBNB_MYSQL_USER"),
+            passwd=getenv("HBNB_MYSQL_PWD"),
+            db=getenv("HBNB_MYSQL_DB"),
         )
         self.query = self.db.cursor()
         self.storage = DBStorage()
-        self.storage.reload()
 
     @classmethod
     def teardown(self):

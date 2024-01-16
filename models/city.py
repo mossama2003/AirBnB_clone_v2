@@ -10,7 +10,7 @@ from sqlalchemy.orm import relationship
 from os import getenv
 
 
-storage_type = getenv("HBNB_TYPE_STORAGE")
+type_of_storage = getenv("HBNB_TYPE_STORAGE")
 
 
 class City(BaseModel, Base):
@@ -19,7 +19,7 @@ class City(BaseModel, Base):
     """
 
     __tablename__ = "cities"
-    if storage_type == "db":
+    if type_of_storage == "db":
         state_id = Column(
             String(60),
             ForeignKey("states.id"),
@@ -45,8 +45,8 @@ class City(BaseModel, Base):
             to the current City.id
             """
             places = models.storage.all(Place)
-            list_places = []
+            places_lista = []
             for place in places.values():
                 if place.city_id == self.id:
-                    list_places.append(place)
-            return list_places
+                    places_lista.append(place)
+            return places_lista

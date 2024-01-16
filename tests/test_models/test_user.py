@@ -10,18 +10,18 @@ class TestUser(unittest.TestCase):
     """this will test the User class"""
 
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(c):
         """set up for test"""
-        cls.user = User()
-        cls.user.first_name = "Kevin"
-        cls.user.last_name = "Yook"
-        cls.user.email = "yook00627@gmamil.com"
-        cls.user.password = "secret"
+        c.user = User()
+        c.user.first_name = "Kevin"
+        c.user.last_name = "Yook"
+        c.user.email = "yook00627@gmamil.com"
+        c.user.password = "secret"
 
     @classmethod
-    def teardown(cls):
+    def teardown(c):
         """at the end of the test this will tear it down"""
-        del cls.user
+        del c.user
 
     def tearDown(self):
         """teardown"""
