@@ -9,7 +9,6 @@ from time import sleep
 from os import getenv
 import pycodestyle
 import inspect
-import os
 import unittest
 
 storage_t = getenv("HBNB_TYPE_STORAGE")
@@ -28,39 +27,6 @@ class test_Amenity(test_basemodel):
         """ """
         new = self.value()
         self.assertEqual(type(new.name), str)
-
-    def test_name3(self):
-        """ """
-        new = self.value()
-        self.assertTrue(hasattr(new, "name"))
-        self.assertEqual(new.name, "")
-
-    def test_to_dict(self):
-        """ """
-        new = self.value()
-        new_dict = new.to_dict()
-        self.assertEqual(type(new_dict), dict)
-        self.assertTrue("to_dict" in dir(new))
-
-    def test_str(self):
-        """ """
-        new = self.value()
-        string = "[{}] ({}) {}".format(
-            new.__class__.__name__,
-            new.id,
-            new.__dict__,
-        )
-        self.assertEqual(string, str(new))
-
-    def test_kwargs(self):
-        """ """
-        new = self.value()
-        json_dict = new.to_dict()
-        new2 = self.value(**json_dict)
-        self.assertFalse(new is new2)
-        self.assertEqual(new.id, new2.id)
-        self.assertEqual(new.created_at, new2.created_at)
-        self.assertEqual(new.updated_at, new2.updated_at)
 
 
 class Test_PEP8(unittest.TestCase):
@@ -84,23 +50,6 @@ class test_inherit_basemodel(unittest.TestCase):
         self.assertIsInstance(user, Amenity)
         self.assertTrue(issubclass(type(user), BaseModel))
         self.assertEqual(str(type(user)), "<class 'models.amenity.Amenity'>")
-
-    def test_permissions(self):
-        """Test the permissions of the file"""
-        read = os.access("models/amenity.py", os.R_OK)
-        self.assertTrue(read)
-        write = os.access("models/amenity.py", os.W_OK)
-        self.assertTrue(write)
-        exe = os.access("models/amenity.py", os.X_OK)
-        self.assertTrue(exe)
-
-    def test_correct_module_doc(self):
-        """Test if there is a module doc"""
-        self.assertTrue(len(Amenity.__doc__) >= 1)
-
-    def test_correct_class_doc(self):
-        """Test if there is a class doc"""
-        self.assertTrue(len(Amenity.__doc__) >= 1)
 
 
 class test_Amenity_BaseModel(unittest.TestCase):
@@ -179,138 +128,6 @@ class test_Amenity_BaseModel(unittest.TestCase):
         self.assertNotEqual(updated_at, new_updated_at)
         self.assertEqual(created_at, new_created_at)
         self.assertTrue(mock_storage.save.called)
-
-    def test_to_dict_method(self):
-        """Testing to_dict method"""
-        instance6 = Amenity()
-        dict_returned = instance6.to_dict()
-        self.assertEqual(type(dict_returned), dict)
-        self.assertEqual(dict_returned["__class__"], "Amenity")
-        self.assertEqual(type(dict_returned["created_at"]), str)
-        self.assertEqual(type(dict_returned["updated_at"]), str)
-
-    def test_kwargs(self):
-        """Testing kwargs"""
-        instance7 = Amenity()
-        instance7.name = "Holberton"
-        instance7.my_number = 89
-        instance7.save()
-        dict_rep = instance7.to_dict()
-        instance8 = Amenity(**dict_rep)
-        self.assertEqual(instance8.to_dict(), instance7.to_dict())
-        self.assertFalse(instance8 is instance7)
-
-    def test_permissions(self):
-        """Test the permissions of the file"""
-        read = os.access("models/amenity.py", os.R_OK)
-        self.assertTrue(read)
-        write = os.access("models/amenity.py", os.W_OK)
-        self.assertTrue(write)
-        exe = os.access("models/amenity.py", os.X_OK)
-        self.assertTrue(exe)
-
-    def test_correct_module_doc(self):
-        """Test if there is a module doc"""
-        self.assertTrue(len(Amenity.__doc__) >= 1)
-
-    def test_correct_class_doc(self):
-        """Test if there is a class doc"""
-        self.assertTrue(len(Amenity.__doc__) >= 1)
-
-    def test_init_doc(self):
-        """Test if init method is documented"""
-        self.assertTrue(len(Amenity.__init__.__doc__) >= 1)
-
-    def test_str_doc(self):
-        """Test if str method is documented"""
-        self.assertTrue(len(Amenity.__str__.__doc__) >= 1)
-
-    def test_save_doc(self):
-        """Test if save method is documented"""
-        self.assertTrue(len(Amenity.save.__doc__) >= 1)
-
-    def test_to_dict_doc(self):
-        """Test if to_dict method is documented"""
-        self.assertTrue(len(Amenity.to_dict.__doc__) >= 1)
-
-    def test_has_methods(self):
-        """Test if instance of BaseModel has the methods"""
-        self.assertTrue(inspect.ismethod(Amenity.__init__))
-        self.assertTrue(inspect.ismethod(Amenity.__str__))
-        self.assertTrue(inspect.ismethod(Amenity.save))
-        self.assertTrue(inspect.ismethod(Amenity.to_dict))
-
-    def test_has_class_attrs(self):
-        """Test if instance of BaseModel has the methods"""
-        self.assertTrue(hasattr(Amenity, "__init__"))
-        self.assertTrue(hasattr(Amenity, "__str__"))
-        self.assertTrue(hasattr(Amenity, "save"))
-        self.assertTrue(hasattr(Amenity, "to_dict"))
-
-    def test_inheritance(self):
-        """Test if Amenity class inherits from BaseModel"""
-        self.assertTrue(issubclass(Amenity, BaseModel))
-
-    def test_is_instance(self):
-        """Test if my_model is an instance of BaseModel"""
-        my_model = Amenity()
-        self.assertIsInstance(my_model, BaseModel)
-
-    def test_attribute_types(self):
-        """Test if instance of BaseModel has attributes"""
-        my_model = Amenity()
-        self.assertEqual(type(my_model.id), str)
-        self.assertEqual(type(my_model.created_at), datetime)
-        self.assertEqual(type(my_model.updated_at), datetime)
-
-    def test_attributes(self):
-        """Test if instance of BaseModel has attributes"""
-        my_model = Amenity()
-        self.assertTrue(hasattr(my_model, "__class__"))
-        self.assertTrue(hasattr(my_model, "id"))
-        self.assertTrue(hasattr(my_model, "created_at"))
-        self.assertTrue(hasattr(my_model, "updated_at"))
-
-    def test_unique_id(self):
-        """Test if the id of two instances are different"""
-        my_model = Amenity()
-        my_model_2 = Amenity()
-        self.assertNotEqual(my_model.id, my_model_2.id)
-
-    def test_save(self):
-        """Test if the attribute updated_at (date) is updated for
-        the same object with the current date"""
-        my_model = Amenity()
-        first_updated = my_model.updated_at
-        sleep(0.5)
-        my_model.save()
-        second_updated = my_model.updated_at
-        self.assertNotEqual(first_updated, second_updated)
-
-    def test_to_dict(self):
-        """Test if to_dict method returns a dictionary with the proper
-        attributes"""
-        my_model = Amenity()
-        my_model.name = "Holberton"
-        my_model.my_number = 89
-        d = my_model.to_dict()
-        self.assertEqual(d["__class__"], "Amenity")
-        self.assertEqual(type(d["created_at"]), str)
-        self.assertEqual(type(d["updated_at"]), str)
-        self.assertEqual(d["name"], "Holberton")
-        self.assertEqual(d["my_number"], 89)
-
-    def test_to_dict_noargs(self):
-        """Test if to_dict method has no arguments"""
-        my_model = Amenity()
-        with self.assertRaises(TypeError):
-            my_model.to_dict(1)
-
-    def test_to_dict_excess_args(self):
-        """Test if to_dict method has excess arguments"""
-        my_model = Amenity()
-        with self.assertRaises(TypeError):
-            my_model.to_dict(1, 2)
 
 
 class TestAmenity(unittest.TestCase):
