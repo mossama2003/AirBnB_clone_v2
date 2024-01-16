@@ -24,3 +24,18 @@ class City(BaseModel, Base):
     else:
         name = ""
         state_id = ""
+
+        @property
+        def places(self):
+            """
+            Getter attribute in case of file storage.
+            """
+            from models import storage
+            from models.place import Place
+
+            places = storage.all(Place)
+            places_list = []
+            for place in places.values():
+                if place.city_id == self.id:
+                    places_list.append(place)
+            return places_list
