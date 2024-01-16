@@ -15,21 +15,18 @@ class test_basemodel(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         """ """
         super().__init__(*args, **kwargs)
-        self.name = "BaseModel"
+        self.name = 'BaseModel'
         self.value = BaseModel
-
     """
     A class to test pep8 on base_model file"""
-
     def test_pycodestyle(self):
         """
         Test pep8 format
         """
         pycostyle = pycodestyle.StyleGuide(quiet=True)
-        result = pycostyle.check_files(["models/base_model.py"])
-        self.assertEqual(
-            result.total_errors, 0, "Found code style errors (and warnings)."
-        )
+        result = pycostyle.check_files(['models/base_model.py'])
+        self.assertEqual(result.total_errors, 0,
+                         "Found code style errors (and warnings).")
 
     def setUp(self):
         """ """
@@ -37,8 +34,8 @@ class test_basemodel(unittest.TestCase):
 
     def tearDown(self):
         try:
-            os.remove("file.json")
-        except Exception:
+            os.remove('file.json')
+        except:
             pass
 
     def test_default(self):
@@ -62,25 +59,19 @@ class test_basemodel(unittest.TestCase):
             new = BaseModel(**copy)
 
     def test_save(self):
-        """Testing save"""
+        """ Testing save """
         i = self.value()
         i.save()
         key = self.name + "." + i.id
-        with open("file.json", "r") as f:
+        with open('file.json', 'r') as f:
             j = json.load(f)
             self.assertEqual(j[key], i.to_dict())
 
     def test_str(self):
         """ """
         i = self.value()
-        self.assertEqual(
-            str(i),
-            "[{}] ({}) {}".format(
-                self.name,
-                i.id,
-                i.__dict__,
-            ),
-        )
+        self.assertEqual(str(i), '[{}] ({}) {}'.format(self.name, i.id,
+                         i.__dict__))
 
     def test_todict(self):
         """ """
@@ -125,7 +116,8 @@ class test_basemodel(unittest.TestCase):
         instance1 = BaseModel()
         instance2 = BaseModel()
         instance3 = BaseModel()
-        list_instances = [instance1, instance2, instance3]
+        list_instances = [instance1, instance2,
+                          instance3]
         for instance in list_instances:
             ins_uuid = instance.id
             with self.subTest(uuid=ins_uuid):
@@ -137,31 +129,26 @@ class test_basemodel(unittest.TestCase):
     def test_str_method(self):
         """Testing returns STR method"""
         instance6 = BaseModel()
-        string_output = "[BaseModel] ({}) {}".format(
-            instance6.id,
-            instance6.__dict__,
-        )
+        string_output = "[BaseModel] ({}) {}".format(instance6.id,
+                                                     instance6.__dict__)
         self.assertEqual(string_output, str(instance6))
 
 
 class TestCodeFormat(unittest.TestCase):
     """
     A class to test pep8 on base_model file"""
-
     def test_pycodestyle(self):
         """
         Test pep8 format
         """
         pycostyle = pycodestyle.StyleGuide(quiet=True)
-        result = pycostyle.check_files(["models/base_model.py"])
-        self.assertEqual(
-            result.total_errors, 0, "Found code style errors (and warnings)."
-        )
+        result = pycostyle.check_files(['models/base_model.py'])
+        self.assertEqual(result.total_errors, 0,
+                         "Found code style errors (and warnings).")
 
 
 class Test_docstrings(unittest.TestCase):
     """Test docstrings"""
-
     @classmethod
     def setup_class(self):
         """
@@ -198,7 +185,7 @@ class TestBaseModel(unittest.TestCase):
     def test_pep8_BaseModel(self):
         """Testing for pep8"""
         style = pep8.StyleGuide(quiet=True)
-        p = style.check_files(["models/base_model.py"])
+        p = style.check_files(['models/base_model.py'])
         self.assertEqual(p.total_errors, 0, "fix pep8")
 
     def test_checking_for_docstring_BaseModel(self):
@@ -227,9 +214,9 @@ class TestBaseModel(unittest.TestCase):
     def test_to_dict_BaseModel(self):
         """test if dictionary works"""
         base_dict = self.base.to_dict()
-        self.assertEqual(self.base.__class__.__name__, "BaseModel")
-        self.assertIsInstance(base_dict["created_at"], str)
-        self.assertIsInstance(base_dict["updated_at"], str)
+        self.assertEqual(self.base.__class__.__name__, 'BaseModel')
+        self.assertIsInstance(base_dict['created_at'], str)
+        self.assertIsInstance(base_dict['updated_at'], str)
 
 
 if __name__ == "__main__":
