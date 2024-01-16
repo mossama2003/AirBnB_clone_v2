@@ -1,22 +1,32 @@
 #!/usr/bin/python3
 """This is the place class"""
-from sqlalchemy.ext.declarative import declarative_base
 from models.base_model import BaseModel, Base
+from models.review import Review
+from models.amenity import Amenity
+
 from sqlalchemy import Column, Table, String, Integer, Float, ForeignKey
 from sqlalchemy.orm import relationship
 from os import getenv
-import models
 
 
-place_amenity = Table("place_amenity", Base.metadata,
-                      Column("place_id", String(60),
-                             ForeignKey("places.id"),
-                             primary_key=True,
-                             nullable=False),
-                      Column("amenity_id", String(60),
-                             ForeignKey("amenities.id"),
-                             primary_key=True,
-                             nullable=False))
+place_amenity = Table(
+    "place_amenity",
+    Base.metadata,
+    Column(
+        "place_id",
+        String(60),
+        ForeignKey("places.id"),
+        primary_key=True,
+        nullable=False,
+    ),
+    Column(
+        "amenity_id",
+        String(60),
+        ForeignKey("amenities.id"),
+        primary_key=True,
+        nullable=False,
+    ),
+)
 
 
 class Place(BaseModel, Base):
@@ -34,6 +44,7 @@ class Place(BaseModel, Base):
         longitude: longitude in float
         amenity_ids: list of Amenity ids
     """
+
     __tablename__ = "places"
     city_id = Column(String(60), ForeignKey("cities.id"), nullable=False)
     user_id = Column(String(60), ForeignKey("users.id"), nullable=False)
@@ -46,38 +57,53 @@ class Place(BaseModel, Base):
     latitude = Column(Float)
     longitude = Column(Float)
     amenity_ids = []
-
+    reviews = relationship("Review", backref="place", cascade="delete")
+    amenities = relationship(
+        "Amenity",
+        secondary="place_amenity",
+        viewonly=False,
+        backref="place_amenities",
+        cascade="delete",
+    )
     if getenv("HBNB_TYPE_STORAGE") == "db":
-        reviews = relationship("Review", cascade='all, delete, delete-orphan',
-                               backref="place")
-
-        amenities = relationship("Amenity", secondary=place_amenity,
-                                 viewonly=False,
-                                 back_populates="place_amenities")
+        reviews = relationship("Review", backref="place", cascade="delete")
+        amenities = relationship(
+            "Amenity",
+            secondary="place_amenity",
+            viewonly=False,
+            backref="place_amenities",
+            cascade="delete",
+        )
     else:
+
         @property
         def reviews(self):
-            """ Returns list of reviews.id """
-            var = models.storage.all()
-            lista = []
-            result = []
-            for key in var:
-                review = key.replace('.', ' ')
-                review = shlex.split(review)
-                if (review[0] == 'Review'):
-                    lista.append(var[key])
-            for elem in lista:
-                if (elem.place_id == self.id):
-                    result.append(elem)
-            return (result)
+            """getter attribute for list of review instances"""
+            from models import storage
+
+            review_list = []
+            all_reviews = storage.all(Review)
+            for review in all_reviews.values():
+                if review.place_id == self.id:
+                    review_list.append(review)
+            return review_list
 
         @property
         def amenities(self):
-            """ Returns list of amenity ids """
-            return self.amenity_ids
+            """getter attribute for list of amenity instances"""
+            from models import storage
+
+            amenity_list = []
+            all_amenities = storage.all(Amenity)
+            for amenity in all_amenities.values():
+                if amenity.id in self.amenity_ids:
+                    amenity_list.append(amenity)
+            return amenity_list
 
         @amenities.setter
-        def amenities(self, obj=None):
-            """ Appends amenity ids to the attribute """
-            if type(obj) is Amenity and obj.id not in self.amenity_ids:
+        def amenities(self, obj):
+            """setter attribute for list of amenity instances"""
+            if type(obj) == Amenity:
                 self.amenity_ids.append(obj.id)
+            else:
+                print("Amenity must be an instance of Amenity class")
