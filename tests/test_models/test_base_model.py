@@ -39,7 +39,7 @@ class test_basemodel(unittest.TestCase):
     def tearDown(self):
         try:
             os.remove("file.json")
-        except:
+        except Exception:
             pass
 
     def test_default(self):
@@ -74,7 +74,14 @@ class test_basemodel(unittest.TestCase):
     def test_str(self):
         """ """
         i = self.value()
-        self.assertEqual(str(i), "[{}] ({}) {}".format(self.name, i.id, i.__dict__))
+        self.assertEqual(
+            str(i),
+            "[{}] ({}) {}".format(
+                self.name,
+                i.id,
+                i.__dict__,
+            ),
+        )
 
     def test_todict(self):
         """ """
@@ -125,7 +132,10 @@ class test_basemodel(unittest.TestCase):
     def test_str_method(self):
         """Testing returns STR method"""
         instance6 = BaseModel()
-        string_output = "[BaseModel] ({}) {}".format(instance6.id, instance6.__dict__)
+        string_output = "[BaseModel] ({}) {}".format(
+            instance6.id,
+            instance6.__dict__,
+        )
         self.assertEqual(string_output, str(instance6))
 
     def test_save_method(self):
@@ -141,7 +151,14 @@ class test_basemodel(unittest.TestCase):
         instance8.my_number = 89
         instance8.save()
         instance8_json = instance8.to_dict()
-        list_att = ["id", "created_at", "updated_at", "name", "my_number", "__class__"]
+        list_att = [
+            "id",
+            "created_at",
+            "updated_at",
+            "name",
+            "my_number",
+            "__class__",
+        ]
         self.assertCountEqual(instance8_json.keys(), list_att)
         self.assertEqual(instance8_json["__class__"], "BaseModel")
         self.assertEqual(instance8_json["name"], "Holberton")

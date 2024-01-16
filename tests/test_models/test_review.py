@@ -38,7 +38,11 @@ class test_review(test_basemodel):
     def test_str(self):
         """ """
         new = self.value()
-        string = "[{}] ({}) {}".format(new.__class__.__name__, new.id, new.__dict__)
+        string = "[{}] ({}) {}".format(
+            new.__class__.__name__,
+            new.id,
+            new.__dict__,
+        )
         self.assertEqual(string, str(new))
 
     def test_kwargs(self):
