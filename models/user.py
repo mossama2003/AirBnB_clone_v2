@@ -31,32 +31,30 @@ class User(BaseModel, Base):
         first_name = ""
         last_name = ""
 
-    if storage_type != "db":
+    @property
+    def places(self):
+        """
+        Getter attribute in case of file storage.
+        """
+        from models import storage
+        from models.place import Place
 
-        @property
-        def places(self):
-            """
-            Getter attribute in case of file storage
-            """
-            from models import storage
+        place_list = []
+        for place in storage.all(Place).values():
+            if place.user_id == self.id:
+                place_list.append(place)
+        return place_list
 
-            places = storage.all(Place)
-            places_list = []
-            for place in places.values():
-                if place.user_id == self.id:
-                    places_list.append(place)
-            return places_list
+    @property
+    def reviews(self):
+        """
+        Getter attribute in case of file storage.
+        """
+        from models import storage
+        from models.review import Review
 
-        @property
-        def reviews(self):
-            """
-            Getter attribute in case of file storage
-            """
-            from models import storage
-
-            reviews = storage.all(Review)
-            reviews_list = []
-            for review in reviews.values():
-                if review.user_id == self.id:
-                    reviews_list.append(review)
-            return reviews_list
+        review_list = []
+        for review in storage.all(Review).values():
+            if review.user_id == self.id:
+                review_list.append(review)
+        return review_list
