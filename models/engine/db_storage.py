@@ -50,11 +50,10 @@ class DBStorage:
         if obj:
             try:
                 self.__session.add(obj)
-                self.__session.flush()
-                self.__session.refresh(obj)
+                self.__session.commit()  # Commit immediately to get the object's ID
             except Exception as e:
                 self.__session.rollback()
-                raise e
+            raise e
 
     def save(self):
         """save changes"""
@@ -67,6 +66,7 @@ class DBStorage:
 
     def reload(self):
         """configuration"""
+        self.__session.close()
         Base.metadata.create_all(self.__engine)
         sess = sessionmaker(bind=self.__engine, expire_on_commit=False)
         Session = scoped_session(sess)
