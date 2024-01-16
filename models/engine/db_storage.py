@@ -33,27 +33,28 @@ class DBStorage:
             Base.metadata.drop_all(self.__engine)
 
     def all(self, cls=None):
-        """returns a dictionary
-        Return:
-            returns a dictionary of __object
-        """
+        """return all objects"""
         if cls is None:
-            obj = self.__session.query(State).all()
-            obj += self.__session.query(City).all()
-            obj += self.__session.query(User).all()
-            obj += self.__session.query(Place).all()
-            obj += self.__session.query(Review).all()
-            obj += self.__session.query(Amenity).all()
+            objs = self.__session.query(State).all()
+            objs += self.__session.query(City).all()
+            objs += self.__session.query(User).all()
+            objs += self.__session.query(Place).all()
+            objs += self.__session.query(Review).all()
+            objs += self.__session.query(Amenity).all()
         else:
-            obj = self.__session.query(cls).all()
-        return {obj.id: obj for obj in obj} if obj else {}
+            objs = self.__session.query(cls).all()
+        return {obj.id: obj for obj in objs}
 
     def new(self, obj):
-        """add a new element in the table"""
+        """add new object"""
         if obj:
-            self.__session.add(obj)
-            self.__session.flush()
-            self.__session.refresh(obj)
+            try:
+                self.__session.add(obj)
+                self.__session.flush()
+                self.__session.refresh(obj)
+            except Exception as e:
+                self.__session.rollback()
+                raise e
 
     def save(self):
         """save changes"""
@@ -61,10 +62,8 @@ class DBStorage:
 
     def delete(self, obj=None):
         """delete object"""
-        if obj:
+        if obj is not None:
             self.__session.delete(obj)
-            self.__session.flush()
-            self.__session.refresh(obj)
 
     def reload(self):
         """configuration"""

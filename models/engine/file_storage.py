@@ -27,17 +27,14 @@ class FileStorage:
         Return:
             returns a dictionary of __object
         """
-        dic = {}
-        if cls:
-            dictionary = self.__objects
-            for key in dictionary:
-                partition = key.replace(".", " ")
-                partition = shlex.split(partition)
-                if partition[0] == cls.__name__:
-                    dic[key] = self.__objects[key]
-            return dic
-        else:
+        if cls is None:
             return self.__objects
+        else:
+            new_dict = {}
+            for key, value in self.__objects.items():
+                if type(value) == cls:
+                    new_dict[key] = value
+            return new_dict
 
     def new(self, obj):
         """sets __object to given obj
@@ -70,7 +67,13 @@ class FileStorage:
         """delete an existing element"""
         if obj:
             key = "{}.{}".format(type(obj).__name__, obj.id)
-            del self.__objects[key]
+            if key in self.__objects:
+                del self.__objects[key]
+                self.save()
+            else:
+                pass
+        else:
+            pass
 
     def close(self):
         """calls reload()"""
