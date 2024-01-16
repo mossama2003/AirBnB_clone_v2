@@ -14,7 +14,7 @@ class TestUser(unittest.TestCase):
     def tearDown(self):
         try:
             os.remove("file.json")
-        except:
+        except Exception:
             pass
 
     def test_is_subclass(self):

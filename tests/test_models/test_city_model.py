@@ -16,7 +16,7 @@ class TestCity(unittest.TestCase):
         """Clean everything up after running setup"""
         try:
             os.remove("file.json")
-        except:
+        except Exception:
             pass
 
     def test_is_subclass(self):
