@@ -23,7 +23,7 @@ class test_console(unittest.TestCase):
         """Clean everything up after running setup"""
         try:
             os.remove("file.json")
-        except:
+        except Exception:
             pass
 
     def test_create(self):
@@ -38,7 +38,10 @@ class test_console(unittest.TestCase):
         with patch("sys.stdout", new=StringIO()) as f:
             self.consol.onecmd('create State name="California"')
             self.consol.onecmd("show State uuid")
-            self.assertEqual(f.getvalue(), "[State] (uuid) {'name': 'California'}\n")
+            self.assertEqual(
+                f.getvalue(),
+                "[State] (uuid) {'name': 'California'}\n",
+            )
 
     def test_destroy(self):
         """Test the destroy command"""
@@ -53,7 +56,10 @@ class test_console(unittest.TestCase):
         with patch("sys.stdout", new=StringIO()) as f:
             self.consol.onecmd('create State name="California"')
             self.consol.onecmd("all State")
-            self.assertEqual(f.getvalue(), "[State] (uuid) {'name': 'California'}\n")
+            self.assertEqual(
+                f.getvalue(),
+                "[State] (uuid) {'name': 'California'}\n",
+            )
 
     def test_update(self):
         """Test the update command"""
@@ -61,7 +67,10 @@ class test_console(unittest.TestCase):
             self.consol.onecmd('create State name="California"')
             self.consol.onecmd('update State uuid name "New Mexico"')
             self.consol.onecmd("show State uuid")
-            self.assertEqual(f.getvalue(), "[State] (uuid) {'name': 'New Mexico'}\n")
+            self.assertEqual(
+                f.getvalue(),
+                "[State] (uuid) {'name': 'New Mexico'}\n",
+            )
 
     def test_quit(self):
         """Test the quit command"""
@@ -79,7 +88,10 @@ class test_console(unittest.TestCase):
             self.consol.onecmd("help")
             self.assertEqual(
                 f.getvalue(),
-                "Documented commands (type help <topic>):\n========================================\nEOF  all  count  create  destroy  help  quit  show  update\n\n",
+                """Documented commands (type help <topic>):\n
+                ========================================\n
+                EOF  all  count  create  destroy  help  quit  show
+                update\n\n""",
             )
 
     def test_count(self):
@@ -88,3 +100,46 @@ class test_console(unittest.TestCase):
             self.consol.onecmd('create State name="California"')
             self.consol.onecmd("count State")
             self.assertEqual(f.getvalue(), "1\n")
+
+    def test_emptyline(self):
+        """Test the emptyline command"""
+        with patch("sys.stdout", new=StringIO()) as f:
+            self.consol.onecmd("\n")
+            self.assertEqual(f.getvalue(), "")
+
+    def test_create_fail(self):
+        """Test the create command"""
+        with patch("sys.stdout", new=StringIO()) as f:
+            self.consol.onecmd('create State name="California"')
+            self.consol.onecmd("create")
+            self.assertEqual(f.getvalue(), "** class name missing **\n")
+
+    def test_show_fail(self):
+        """Test the show command"""
+        with patch("sys.stdout", new=StringIO()) as f:
+            self.consol.onecmd("show")
+            self.assertEqual(f.getvalue(), "** class name missing **\n")
+
+    def test_destroy_fail(self):
+        """Test the destroy command"""
+        with patch("sys.stdout", new=StringIO()) as f:
+            self.consol.onecmd("destroy")
+            self.assertEqual(f.getvalue(), "** class name missing **\n")
+
+    def test_all_fail(self):
+        """Test the all command"""
+        with patch("sys.stdout", new=StringIO()) as f:
+            self.consol.onecmd("all")
+            self.assertEqual(f.getvalue(), "** class name missing **\n")
+
+    def test_update_fail(self):
+        """Test the update command"""
+        with patch("sys.stdout", new=StringIO()) as f:
+            self.consol.onecmd("update")
+            self.assertEqual(f.getvalue(), "** class name missing **\n")
+
+    def test_count_fail(self):
+        """Test the count command"""
+        with patch("sys.stdout", new=StringIO()) as f:
+            self.consol.onecmd("count")
+            self.assertEqual(f.getvalue(), "** class name missing **\n")

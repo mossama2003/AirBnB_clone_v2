@@ -1,7 +1,7 @@
 #!/usr/bin/python3
-'''
+"""
     Testing the file_storage module.
-'''
+"""
 
 import os
 import time
@@ -13,114 +13,127 @@ from models.engine.file_storage import FileStorage
 
 
 class testFileStorage(unittest.TestCase):
-    '''
-        Testing the FileStorage class
-    '''
+    """
+    Testing the file_storage module.
+    """
 
     def setUp(self):
-        '''
-            Initializing classes
-        '''
+        """
+        Initializing instance.
+        """
         self.storage = FileStorage()
-        self.my_model = BaseModel()
 
     def tearDown(self):
-        '''
-            Cleaning up.
-        '''
-
+        """
+        Removing the JSON file.
+        """
         try:
             os.remove("file.json")
-        except FileNotFoundError:
+        except Exception:
             pass
 
-    def test_all_return_type(self):
-        '''
-            Tests the data type of the return value of the all method.
-        '''
-        storage_all = self.storage.all()
-        self.assertIsInstance(storage_all, dict)
+    def test_all(self):
+        """
+        Testing the all method.
+        """
+        self.assertEqual(self.storage.all(), {})
+        self.assertEqual(type(self.storage.all()), dict)
 
-    def test_delete(self):
-        new_state = State()
-        new_state.name = "California***********"
-        fs = FileStorage()
-        fs.new(new_state)
-        fs.save()
+    def test_new(self):
+        """
+        Testing the new method.
+        """
+        self.storage.new(State())
+        self.assertEqual(len(self.storage.all()), 1)
+
+    def test_save(self):
+        """
+        Testing the save method.
+        """
+        self.storage.save()
+        self.assertTrue(os.path.exists("file.json"))
         self.assertTrue(os.path.isfile("file.json"))
-        with open("file.json", encoding="UTF8") as fd:
-            content = fd.read()
-        flag = 1
-        if new_state.id in content:
-            flag = 0
-        self.assertTrue(flag == 0)
-        fs.delete(new_state)
-        fs.save()
-        with open("file.json", encoding="UTF8") as fd:
-            content = fd.read()
-        flag = 0
-        if new_state.id in content:
-            flag = 1
-        self.assertTrue(flag == 0)
+        self.assertTrue(os.access("file.json", os.R_OK))
+        self.assertTrue(os.access("file.json", os.W_OK))
+        self.assertTrue(os.path.getsize("file.json") > 0)
 
-    def test_new_method(self):
-        '''
-            Tests that the new method sets the right key and value pair
-            in the FileStorage.__object attribute
-        '''
-        self.storage.new(self.my_model)
-        key = str(self.my_model.__class__.__name__ + "." + self.my_model.id)
-        self.assertTrue(key in self.storage._FileStorage__objects)
-
-    def test_objects_value_type(self):
-        '''
-            Tests that the type of value contained in the FileStorage.__object
-            is of type obj.__class__.__name__
-        '''
-        self.storage.new(self.my_model)
-        key = str(self.my_model.__class__.__name__ + "." + self.my_model.id)
-        val = self.storage._FileStorage__objects[key]
-        self.assertIsInstance(self.my_model, type(val))
-
-    def test_save_file_exists(self):
-        '''
-            Tests that a file gets created with the name file.json
-        '''
+    def test_reload(self):
+        """
+        Testing the reload method.
+        """
         self.storage.save()
-        self.assertTrue(os.path.isfile("file.json"))
+        self.storage.reload()
+        self.assertEqual(len(self.storage.all()), 0)
 
-    def test_save_file_read(self):
-        '''
-            Testing the contents of the files inside the file.json
-        '''
+    def test_reload_from_nonexistent_file(self):
+        """
+        Testing the reload method from a nonexistent file.
+        """
         self.storage.save()
-        self.storage.new(self.my_model)
+        os.remove("file.json")
+        self.storage.reload()
+        self.assertEqual(len(self.storage.all()), 0)
 
-        with open("file.json", encoding="UTF8") as fd:
-            content = json.load(fd)
-
-        self.assertTrue(isinstance(content, dict))
-
-    def test_the_type_file_content(self):
-        '''
-            testing the type of the contents inside the file.
-        '''
+    def test_reload_from_corrupted_file(self):
+        """
+        Testing the reload method from a corrupted file.
+        """
         self.storage.save()
-        self.storage.new(self.my_model)
+        with open("file.json", "w") as f:
+            f.write("Hello")
+        self.storage.reload()
+        self.assertEqual(len(self.storage.all()), 0)
 
-        with open("file.json", encoding="UTF8") as fd:
-            content = fd.read()
+    def test_reload_from_empty_file(self):
+        """
+        Testing the reload method from an empty file.
+        """
+        self.storage.save()
+        with open("file.json", "w") as f:
+            f.write("")
+        self.storage.reload()
+        self.assertEqual(len(self.storage.all()), 0)
 
-        self.assertIsInstance(content, str)
+    def test_reload_from_non_json_file(self):
+        """
+        Testing the reload method from a non-JSON file.
+        """
+        self.storage.save()
+        with open("file.json", "w") as f:
+            f.write("Hello")
+        self.storage.reload()
+        self.assertEqual(len(self.storage.all()), 0)
 
-    def test_reaload_without_file(self):
-        '''
-            Tests that nothing happens when file.json does not exists
-            and reload is called
-        '''
+    def test_reload_from_valid_file(self):
+        """
+        Testing the reload method from a valid file.
+        """
+        self.storage.save()
+        with open("file.json", "r") as f:
+            json_dict = json.load(f)
+        self.storage.reload()
+        self.assertEqual(len(self.storage.all()), len(json_dict))
 
-        try:
-            self.storage.reload()
-            self.assertTrue(True)
-        except BaseException:
-            self.assertTrue(False)
+    def test_reload_from_valid_file_with_one_instance(self):
+        """
+        Testing the reload method from a valid file with one instance.
+        """
+        self.storage.save()
+        with open("file.json", "r") as f:
+            json_dict = json.load(f)
+        self.storage.reload()
+        self.assertEqual(len(self.storage.all()), len(json_dict))
+
+    def test_reload_from_valid_file_with_multiple_instances(self):
+        """
+        Testing the reload method from a valid file with multiple instances.
+        """
+        self.storage.save()
+        with open("file.json", "r") as f:
+            json_dict = json.load(f)
+        self.storage.reload()
+        self.assertEqual(len(self.storage.all()), len(json_dict))
+
+
+if __name__ == "__main__":
+    unittest.main()

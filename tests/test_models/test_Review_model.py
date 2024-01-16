@@ -48,3 +48,7 @@ class TestReview(unittest.TestCase):
             self.r.__dict__,
         )
         self.assertEqual(string, str(self.r))
+
+
+if __name__ == "__main__":
+    unittest.main()

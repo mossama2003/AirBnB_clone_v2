@@ -46,3 +46,7 @@ class TestState(unittest.TestCase):
             self.state.__dict__,
         )
         self.assertEqual(string, str(self.state))
+
+
+if __name__ == "__main__":
+    unittest.main()

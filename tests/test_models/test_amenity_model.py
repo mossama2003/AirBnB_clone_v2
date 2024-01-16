@@ -50,3 +50,7 @@ class TestAmenity(unittest.TestCase):
             self.amenity.__dict__,
         )
         self.assertEqual(string, str(self.amenity))
+
+
+if __name__ == "__main__":
+    unittest.main()

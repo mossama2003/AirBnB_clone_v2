@@ -73,3 +73,59 @@ class TestPlace(unittest.TestCase):
         old_updated_at = self.place.updated_at
         self.place.save()
         self.assertNotEqual(old_updated_at, self.place.updated_at)
+
+    def test_to_dict_values(self):
+        """Test that values in to_dict are the same as in __dict__"""
+        new_dict = self.place.to_dict()
+        for key, value in new_dict.items():
+            self.assertEqual(value, self.place.__dict__[key])
+
+    def test_init(self):
+        """Test that the init method creates an instance of Place"""
+        self.assertTrue(isinstance(self.place, Place))
+
+    def test_init_arg(self):
+        """Test that the init method takes one argument"""
+        with self.assertRaises(TypeError):
+            bad = Place(None)
+
+    def test_init_kwarg(self):
+        """Test that the init method takes one keyword argument"""
+        with self.assertRaises(TypeError):
+            bad = Place(x=None)
+
+    def test_str_method(self):
+        """Test that the str method produces a string"""
+        self.assertTrue(type(str(self.place)) is str)
+
+    def test_before_todict(self):
+        """Test instances before using to_dict conversion"""
+        self.assertTrue(hasattr(self.place, "__init__"))
+        self.assertTrue(hasattr(self.place, "created_at"))
+        self.assertTrue(hasattr(self.place, "updated_at"))
+        self.assertTrue(hasattr(self.place, "id"))
+
+    def test_after_todict(self):
+        """Test instances after using to_dict conversion"""
+        my_model = self.place.to_dict()
+        self.assertIsInstance(my_model, dict)
+        self.assertTrue(hasattr(my_model, "__class__"))
+        self.assertTrue(hasattr(my_model, "__dict__"))
+        self.assertTrue(hasattr(my_model, "created_at"))
+        self.assertTrue(hasattr(my_model, "updated_at"))
+        self.assertTrue(hasattr(my_model, "id"))
+
+    def test_class_attributes(self):
+        """Test that class attributes are the same"""
+        self.assertEqual(self.place.__class__.__name__, "Place")
+        self.assertEqual(self.place.created_at, self.place.updated_at)
+
+    def test_save(self):
+        """Test that save method updates time"""
+        old = self.place.updated_at
+        self.place.save()
+        self.assertNotEqual(old, self.place.updated_at)
+
+
+if __name__ == "__main__":
+    unittest.main()

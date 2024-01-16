@@ -51,3 +51,7 @@ class TestUser(unittest.TestCase):
             self.user.__dict__,
         )
         self.assertEqual(string, str(self.user))
+
+
+if __name__ == "__main__":
+    unittest.main()

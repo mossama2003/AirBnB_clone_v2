@@ -53,3 +53,7 @@ class TestBaseModel(unittest.TestCase):
             self.base.__dict__,
         )
         self.assertEqual(string, str(self.base))
+
+
+if __name__ == "__main__":
+    unittest.main()

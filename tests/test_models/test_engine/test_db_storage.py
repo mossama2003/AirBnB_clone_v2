@@ -14,10 +14,8 @@ from sqlalchemy import Column, Integer, String, create_engine
 from sqlalchemy.orm import sessionmaker
 
 
-@unittest.skipIf(os.getenv('HBNB_TYPE_STORAGE') != 'db',
-                 "only testing db storage")
+@unittest.skipIf(os.getenv("HBNB_TYPE_STORAGE") != "db", "only testing db storage")
 class test_DBStorage(unittest.TestCase):
-
     def testState(self):
         state = State(name="Greg")
         if state.id in models.storage.all():
@@ -52,3 +50,7 @@ class test_DBStorage(unittest.TestCase):
     def teardown(self):
         self.session.close()
         self.session.rollback()
+
+
+if __name__ == "__main__":
+    unittest.main()
