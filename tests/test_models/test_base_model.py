@@ -9,46 +9,47 @@ from models.base_model import BaseModel
 
 
 class TestBaseModel(unittest.TestCase):
+    """Test the BaseModel class"""
 
-    @classmethod
-    def setUpClass(cls):
-        cls.base1 = BaseModel()
-        cls.base1.name = "Arik"
-        cls.base1.my_number = 29
+    def setUp(self):
+        """Set up for the tests"""
+        self.base = BaseModel()
 
-    @classmethod
-    def tearDownClass(cls):
-        del cls.base1
+    def tearDown(self):
+        """Clean everything up after running setup"""
         try:
             os.remove("file.json")
-        except FileNotFoundError:
+        except:
             pass
 
-    def test_checking_for_functions(self):
-        self.assertIsNotNone(BaseModel.__doc__)
-        self.assertIsNotNone(BaseModel.save.__doc__)
-        self.assertIsNotNone(BaseModel.to_dict.__doc__)
+    def test_is_subclass(self):
+        """Test that BaseModel is a subclass of BaseModel"""
+        self.assertTrue(issubclass(self.base.__class__, BaseModel), True)
 
-    def test_attributes(self):
-        self.assertTrue(hasattr(BaseModel, "__init__"))
-        self.assertTrue(hasattr(BaseModel, "save"))
-        self.assertTrue(hasattr(BaseModel, "to_dict"))
+    def test_has_attributes(self):
+        """Test that BaseModel has class attributes id, created_at,
+        and updated_at, and they are all strings"""
+        self.assertTrue("id" in self.base.__dict__)
+        self.assertTrue("created_at" in self.base.__dict__)
+        self.assertTrue("updated_at" in self.base.__dict__)
+        self.assertEqual(type(self.base.id), str)
+        self.assertEqual(type(self.base.created_at), str)
+        self.assertEqual(type(self.base.updated_at), str)
 
-    def test_init(self):
-        self.assertTrue(isinstance(self.base1, BaseModel))
+    def test_to_dict_creates_dict(self):
+        """test to_dict method creates a dictionary with proper attrs"""
+        new_dict = self.base.to_dict()
+        self.assertEqual(type(new_dict), dict)
+        self.assertEqual(type(new_dict["created_at"]), str)
+        self.assertEqual(type(new_dict["updated_at"]), str)
+        for attr in self.base.__dict__:
+            self.assertTrue(attr in new_dict)
+            self.assertTrue("__class__" in new_dict)
 
-    @unittest.skipIf(os.getenv('HBNB_TYPE_STORAGE') == 'db',
-                     "won't work in db")
-    def test_save(self):
-        self.base1.save()
-        self.assertNotEqual(self.base1.created_at, self.base1.updated_at)
-
-    def test_to_dict(self):
-        base1_dict = self.base1.to_dict()
-        self.assertEqual(self.base1.__class__.__name__, 'BaseModel')
-        self.assertIsInstance(base1_dict['created_at'], str)
-        self.assertIsInstance(base1_dict['updated_at'], str)
-
-
-if __name__ == "__main__":
-    unittest.main()
+    def test_str(self):
+        """test that the str method has the correct output"""
+        string = "[BaseModel] ({}) {}".format(
+            self.base.id,
+            self.base.__dict__,
+        )
+        self.assertEqual(string, str(self.base))

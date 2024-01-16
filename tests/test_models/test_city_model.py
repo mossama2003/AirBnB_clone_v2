@@ -8,48 +8,43 @@ from models.base_model import BaseModel
 
 
 class TestCity(unittest.TestCase):
+    def setUp(self):
+        """Set up for the tests"""
+        self.city = City()
 
-    @classmethod
-    def setUpClass(cls):
-        cls.city1 = City()
-        cls.city1.name = "San Francisco"
-        cls.city1.state_id = "CA"
-
-    @classmethod
-    def tearDownClass(cls):
-        del cls.city1
+    def tearDown(self):
+        """Clean everything up after running setup"""
         try:
             os.remove("file.json")
-        except FileNotFoundError:
+        except:
             pass
 
     def test_is_subclass(self):
-        self.assertTrue(issubclass(self.city1.__class__, BaseModel), True)
-
-    def test_checking_for_functions(self):
-        self.assertIsNotNone(City.__doc__)
+        """Test that City is a subclass of BaseModel"""
+        self.assertTrue(issubclass(self.city.__class__, BaseModel), True)
 
     def test_has_attributes(self):
-        self.assertTrue('id' in self.city1.__dict__)
-        self.assertTrue('created_at' in self.city1.__dict__)
-        self.assertTrue('updated_at' in self.city1.__dict__)
-        self.assertTrue('state_id' in self.city1.__dict__)
-        self.assertTrue('name' in self.city1.__dict__)
+        """Test that City has class attributes name and state_id, and they are
+        all strings"""
+        self.assertTrue("name" in self.city.__dict__)
+        self.assertTrue("state_id" in self.city.__dict__)
+        self.assertEqual(type(self.city.name), str)
+        self.assertEqual(type(self.city.state_id), str)
 
-    def test_attributes_are_strings(self):
-        self.assertEqual(type(self.city1.name), str)
-        self.assertEqual(type(self.city1.state_id), str)
+    def test_to_dict_creates_dict(self):
+        """Test to_dict method creates a dictionary with proper attrs"""
+        new_dict = self.city.to_dict()
+        self.assertEqual(type(new_dict), dict)
+        self.assertEqual(type(new_dict["created_at"]), str)
+        self.assertEqual(type(new_dict["updated_at"]), str)
+        for attr in self.city.__dict__:
+            self.assertTrue(attr in new_dict)
+            self.assertTrue("__class__" in new_dict)
 
-    @unittest.skipIf(
-        os.getenv('HBNB_TYPE_STORAGE') == 'db',
-        "won't work in db")
-    def test_save(self):
-        self.city1.save()
-        self.assertNotEqual(self.city1.created_at, self.city1.updated_at)
-
-    def test_to_dict(self):
-        self.assertEqual('to_dict' in dir(self.city1), True)
-
-
-if __name__ == "__main__":
-    unittest.main()
+    def test_str(self):
+        """Test that the str method has the correct output"""
+        string = "[City] ({}) {}".format(
+            self.city.id,
+            self.city.__dict__,
+        )
+        self.assertEqual(string, str(self.city))

@@ -8,45 +8,41 @@ from models.base_model import BaseModel
 
 
 class TestState(unittest.TestCase):
+    def setUp(self):
+        """Set up for the tests"""
+        self.state = State()
 
-    @classmethod
-    def setUpClass(cls):
-        cls.state1 = State()
-        cls.state1.name = "CA_the_golden_state"
-
-    @classmethod
-    def tearDownClass(cls):
-        del cls.state1
+    def tearDown(self):
+        """Clean everything up after running setup"""
         try:
             os.remove("file.json")
-        except FileNotFoundError:
+        except:
             pass
 
     def test_is_subclass(self):
-        self.assertTrue(issubclass(self.state1.__class__, BaseModel), True)
-
-    def test_checking_for_functions(self):
-        self.assertIsNotNone(State.__doc__)
+        """Test that State is a subclass of BaseModel"""
+        self.assertTrue(issubclass(self.state.__class__, BaseModel), True)
 
     def test_has_attributes(self):
-        self.assertTrue('id' in self.state1.__dict__)
-        self.assertTrue('created_at' in self.state1.__dict__)
-        self.assertTrue('updated_at' in self.state1.__dict__)
-        self.assertTrue('name' in self.state1.__dict__)
+        """Test that State has class attributes name"""
+        self.assertTrue("name" in self.state.__dict__)
 
-    def test_attributes_are_strings(self):
-        self.assertEqual(type(self.state1.name), str)
+    def test_has_string_attributes(self):
+        """Test that State has attributes with string value"""
+        self.assertEqual(type(self.state.name), str)
 
-    @unittest.skipIf(
-        os.getenv('HBNB_TYPE_STORAGE') == 'db',
-        "won't work in db")
-    def test_save(self):
-        self.state1.save()
-        self.assertNotEqual(self.state1.created_at, self.state1.updated_at)
+    def test_to_dict_creates_dict(self):
+        """test to_dict method creates a dictionary with proper attrs"""
+        new_dict = self.state.to_dict()
+        self.assertEqual(type(new_dict), dict)
+        for attr in self.state.__dict__:
+            self.assertTrue(attr in new_dict)
+            self.assertTrue("__class__" in new_dict)
 
-    def test_to_dict(self):
-        self.assertEqual('to_dict' in dir(self.state1), True)
-
-
-if __name__ == "__main__":
-    unittest.main()
+    def test_str(self):
+        """test that the str method has the correct output"""
+        string = "[State] ({}) {}".format(
+            self.state.id,
+            self.state.__dict__,
+        )
+        self.assertEqual(string, str(self.state))

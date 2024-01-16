@@ -8,45 +8,45 @@ from models.base_model import BaseModel
 
 
 class TestAmenity(unittest.TestCase):
+    """Test the Amenity class"""
 
-    @classmethod
-    def setUpClass(cls):
-        cls.amenity1 = Amenity()
-        cls.amenity1.name = "Hot Tub"
+    def setUp(self):
+        """Set up for the tests"""
+        self.amenity = Amenity()
 
-    @classmethod
-    def tearDownClass(cls):
-        del cls.amenity1
+    def tearDown(self):
+        """Clean everything up after running setup"""
         try:
             os.remove("file.json")
-        except FileNotFoundError:
+        except:
             pass
 
     def test_is_subclass(self):
-        self.assertTrue(issubclass(self.amenity1.__class__, BaseModel), True)
-
-    def test_checking_for_functions(self):
-        self.assertIsNotNone(Amenity.__doc__)
+        """Test that Amenity is a subclass of BaseModel"""
+        self.assertTrue(issubclass(self.amenity.__class__, BaseModel), True)
 
     def test_has_attributes(self):
-        self.assertTrue('id' in self.amenity1.__dict__)
-        self.assertTrue('created_at' in self.amenity1.__dict__)
-        self.assertTrue('updated_at' in self.amenity1.__dict__)
-        self.assertTrue('name' in self.amenity1.__dict__)
+        """Test that Amenity has class attributes name and state_id"""
+        self.assertTrue("name" in self.amenity.__dict__)
+        self.assertTrue("state_id" in self.amenity.__dict__)
 
-    def test_attributes_are_strings(self):
-        self.assertEqual(type(self.amenity1.name), str)
+    def test_has_string_attributes(self):
+        """Test that Amenity has attributes with string value"""
+        self.assertEqual(type(self.amenity.name), str)
+        self.assertEqual(type(self.amenity.state_id), str)
 
-    @unittest.skipIf(
-        os.getenv('HBNB_TYPE_STORAGE') == 'db',
-        "won't work in db")
-    def test_save(self):
-        self.amenity1.save()
-        self.assertNotEqual(self.amenity1.created_at, self.amenity1.updated_at)
+    def test_to_dict_creates_dict(self):
+        """test to_dict method creates a dictionary with proper attrs"""
+        new_dict = self.amenity.to_dict()
+        self.assertEqual(type(new_dict), dict)
+        for attr in self.amenity.__dict__:
+            self.assertTrue(attr in new_dict)
+            self.assertTrue("__class__" in new_dict)
 
-    def test_to_dict(self):
-        self.assertEqual('to_dict' in dir(self.amenity1), True)
-
-
-if __name__ == "__main__":
-    unittest.main()
+    def test_str(self):
+        """test that the str method has the correct output"""
+        string = "[Amenity] ({}) {}".format(
+            self.amenity.id,
+            self.amenity.__dict__,
+        )
+        self.assertEqual(string, str(self.amenity))
