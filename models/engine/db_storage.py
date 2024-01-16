@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 """create class DBStorage"""
 from os import getenv
-from sqlalchemy import (create_engine)
+from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
 from models.amenity import Amenity
 from models.base_model import BaseModel, Base
@@ -18,22 +18,30 @@ host = getenv("HBNB_MYSQL_HOST")
 password = getenv("HBNB_MYSQL_PWD")
 hbnb_env = getenv("HBNB_ENV")
 
-classes = {"State": State, "City": City, "User": User,
-           "Place": Place, "Review": Review, "Amenity": Amenity}
+classes = {
+    "State": State,
+    "City": City,
+    "User": User,
+    "Place": Place,
+    "Review": Review,
+    "Amenity": Amenity,
+}
 
 
 class DBStorage:
     """class DBStorage"""
+
     __engine = None
     __session = None
 
     def __init__(self):
         """initialize instances"""
-        self.__engine = create_engine('mysql+mysqldb://{}:{}@{}/{}'.format
-                                      (user, password, host, database),
-                                      pool_pre_ping=True)
+        self.__engine = create_engine(
+            "mysql+mysqldb://{}:{}@{}/{}".format(user, password, host, database),
+            pool_pre_ping=True,
+        )
 
-        if hbnb_env == 'test':
+        if hbnb_env == "test":
             Base.metadata.drop_all(self.__engine)
 
     def all(self, cls=None):
@@ -92,9 +100,8 @@ class DBStorage:
         create all tables in the database and the current database session
         """
         Base.metadata.create_all(self.__engine)
-        session_factory = sessionmaker(bind=self.__engine,
-                                       expire_on_commit=False)
-        Session = scoped_session(session_factory)
+        sess = sessionmaker(bind=self.__engine, expire_on_commit=False)
+        Session = scoped_session(sess)
         self.__session = Session()
 
     def close(self):

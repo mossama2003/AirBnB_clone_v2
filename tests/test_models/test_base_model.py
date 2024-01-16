@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 """ """
+import inspect
 from models.base_model import BaseModel
 import unittest
 import datetime
@@ -15,18 +16,21 @@ class test_basemodel(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         """ """
         super().__init__(*args, **kwargs)
-        self.name = 'BaseModel'
+        self.name = "BaseModel"
         self.value = BaseModel
+
     """
     A class to test pep8 on base_model file"""
+
     def test_pycodestyle(self):
         """
         Test pep8 format
         """
         pycostyle = pycodestyle.StyleGuide(quiet=True)
-        result = pycostyle.check_files(['models/base_model.py'])
-        self.assertEqual(result.total_errors, 0,
-                         "Found code style errors (and warnings).")
+        result = pycostyle.check_files(["models/base_model.py"])
+        self.assertEqual(
+            result.total_errors, 0, "Found code style errors (and warnings)."
+        )
 
     def setUp(self):
         """ """
@@ -34,7 +38,7 @@ class test_basemodel(unittest.TestCase):
 
     def tearDown(self):
         try:
-            os.remove('file.json')
+            os.remove("file.json")
         except:
             pass
 
@@ -59,19 +63,18 @@ class test_basemodel(unittest.TestCase):
             new = BaseModel(**copy)
 
     def test_save(self):
-        """ Testing save """
+        """Testing save"""
         i = self.value()
         i.save()
         key = self.name + "." + i.id
-        with open('file.json', 'r') as f:
+        with open("file.json", "r") as f:
             j = json.load(f)
             self.assertEqual(j[key], i.to_dict())
 
     def test_str(self):
         """ """
         i = self.value()
-        self.assertEqual(str(i), '[{}] ({}) {}'.format(self.name, i.id,
-                         i.__dict__))
+        self.assertEqual(str(i), "[{}] ({}) {}".format(self.name, i.id, i.__dict__))
 
     def test_todict(self):
         """ """
@@ -84,12 +87,6 @@ class test_basemodel(unittest.TestCase):
         n = {None: None}
         with self.assertRaises(TypeError):
             new = self.value(**n)
-
-    # def test_kwargs_one(self):
-    #     """ """
-    #     n = {'Name': 'test'}
-    #     with self.assertRaises(KeyError):
-    #         new = self.value(**n)
 
     def test_id(self):
         """ """
@@ -116,8 +113,7 @@ class test_basemodel(unittest.TestCase):
         instance1 = BaseModel()
         instance2 = BaseModel()
         instance3 = BaseModel()
-        list_instances = [instance1, instance2,
-                          instance3]
+        list_instances = [instance1, instance2, instance3]
         for instance in list_instances:
             ins_uuid = instance.id
             with self.subTest(uuid=ins_uuid):
@@ -129,26 +125,101 @@ class test_basemodel(unittest.TestCase):
     def test_str_method(self):
         """Testing returns STR method"""
         instance6 = BaseModel()
-        string_output = "[BaseModel] ({}) {}".format(instance6.id,
-                                                     instance6.__dict__)
+        string_output = "[BaseModel] ({}) {}".format(instance6.id, instance6.__dict__)
         self.assertEqual(string_output, str(instance6))
+
+    def test_save_method(self):
+        """Testing save method"""
+        instance7 = BaseModel()
+        instance7.save()
+        self.assertNotEqual(instance7.created_at, instance7.updated_at)
+
+    def test_to_dict_method(self):
+        """Testing to_dict method"""
+        instance8 = BaseModel()
+        instance8.name = "Holberton"
+        instance8.my_number = 89
+        instance8.save()
+        instance8_json = instance8.to_dict()
+        list_att = ["id", "created_at", "updated_at", "name", "my_number", "__class__"]
+        self.assertCountEqual(instance8_json.keys(), list_att)
+        self.assertEqual(instance8_json["__class__"], "BaseModel")
+        self.assertEqual(instance8_json["name"], "Holberton")
+        self.assertEqual(instance8_json["my_number"], 89)
+
+    def test_to_dict_method_with_one_param(self):
+        """Testing to_dict method with one param"""
+        instance9 = BaseModel()
+        with self.assertRaises(TypeError):
+            instance9.to_dict(1)
+
+    def test_to_dict_method_with_two_params(self):
+        """Testing to_dict method with two params"""
+        instance10 = BaseModel()
+        with self.assertRaises(TypeError):
+            instance10.to_dict(1, 2)
+
+    def test_to_dict_method_with_none_param(self):
+        """Testing to_dict method with none param"""
+        instance11 = BaseModel()
+        with self.assertRaises(TypeError):
+            instance11.to_dict(None)
+
+    def test_to_dict_method_with_more_than_one_param(self):
+        """Testing to_dict method with more than one param"""
+        instance12 = BaseModel()
+        with self.assertRaises(TypeError):
+            instance12.to_dict(None, None)
+
+    def test_to_dict_method_with_str_param(self):
+        """Testing to_dict method with str param"""
+        instance13 = BaseModel()
+        with self.assertRaises(TypeError):
+            instance13.to_dict("str")
+
+    def test_to_dict_method_with_list_param(self):
+        """Testing to_dict method with list param"""
+        instance14 = BaseModel()
+        with self.assertRaises(TypeError):
+            instance14.to_dict([1, 2, 3])
+
+    def test_to_dict_method_with_set_param(self):
+        """Testing to_dict method with set param"""
+        instance15 = BaseModel()
+        with self.assertRaises(TypeError):
+            instance15.to_dict({1, 2, 3})
+
+    def test_to_dict_method_with_tuple_param(self):
+        """Testing to_dict method with tuple param"""
+        instance16 = BaseModel()
+        with self.assertRaises(TypeError):
+            instance16.to_dict((1, 2, 3))
+
+    def test_to_dict_method_with_frozenset_param(self):
+        """Testing to_dict method with frozenset param"""
+        instance17 = BaseModel()
+        with self.assertRaises(TypeError):
+            instance17.to_dict(frozenset({1, 2, 3}))
 
 
 class TestCodeFormat(unittest.TestCase):
     """
     A class to test pep8 on base_model file"""
+
     def test_pycodestyle(self):
         """
         Test pep8 format
         """
         pycostyle = pycodestyle.StyleGuide(quiet=True)
-        result = pycostyle.check_files(['models/base_model.py'])
-        self.assertEqual(result.total_errors, 0,
-                         "Found code style errors (and warnings).")
+        result = pycostyle.check_files(["models/base_model.py"])
+        self.assertEqual(
+            result.total_errors, 0, "Found code style errors (and warnings)."
+        )
 
 
 class Test_docstrings(unittest.TestCase):
     """Test docstrings"""
+
     @classmethod
     def setup_class(self):
         """
@@ -158,6 +229,12 @@ class Test_docstrings(unittest.TestCase):
         only members for which the predicate returns a true value are included
         """
         self.obj_members(BaseModel, inspect.isfunction)
+
+    def obj_members(self, obj, filter):
+        """obj_members"""
+        for name, value in inspect.getmembers(obj):
+            if filter(value):
+                self.assertTrue(len(value.__doc__) > 0, name)
 
 
 class TestBaseModel(unittest.TestCase):
@@ -185,7 +262,7 @@ class TestBaseModel(unittest.TestCase):
     def test_pep8_BaseModel(self):
         """Testing for pep8"""
         style = pep8.StyleGuide(quiet=True)
-        p = style.check_files(['models/base_model.py'])
+        p = style.check_files(["models/base_model.py"])
         self.assertEqual(p.total_errors, 0, "fix pep8")
 
     def test_checking_for_docstring_BaseModel(self):
@@ -214,9 +291,54 @@ class TestBaseModel(unittest.TestCase):
     def test_to_dict_BaseModel(self):
         """test if dictionary works"""
         base_dict = self.base.to_dict()
-        self.assertEqual(self.base.__class__.__name__, 'BaseModel')
-        self.assertIsInstance(base_dict['created_at'], str)
-        self.assertIsInstance(base_dict['updated_at'], str)
+        self.assertEqual(self.base.__class__.__name__, "BaseModel")
+        self.assertIsInstance(base_dict["created_at"], str)
+        self.assertIsInstance(base_dict["updated_at"], str)
+
+    def test_id_BaseModel(self):
+        """test if the id is an type uuid"""
+        self.assertTrue(isinstance(self.base.id, str))
+
+    def test_str_BaseModel(self):
+        """test if the str works"""
+        string = "[BaseModel] ({}) {}".format(self.base.id, self.base.__dict__)
+        self.assertEqual(string, str(self.base))
+
+    def test_kwargs_BaseModel(self):
+        """test if kwargs works"""
+        json_dict = self.base.to_dict()
+        new = BaseModel(**json_dict)
+        self.assertFalse(self.base is new)
+        self.assertEqual(self.base.id, new.id)
+        self.assertEqual(self.base.created_at, new.created_at)
+        self.assertEqual(self.base.updated_at, new.updated_at)
+
+    def test_kwargs_none_BaseModel(self):
+        """test if kwargs works"""
+        with self.assertRaises(TypeError):
+            new = BaseModel(**None)
+
+    def test_kwargs_many_BaseModel(self):
+        """test if kwargs works"""
+        with self.assertRaises(TypeError):
+            new = BaseModel(**{1: 2, 3: 4})
+
+    def test_kwargs_one_BaseModel(self):
+        """test if kwargs works"""
+        with self.assertRaises(TypeError):
+            new = BaseModel(**{1: 2})
+
+    def test_kwargs_two_BaseModel(self):
+        """test if kwargs works"""
+        with self.assertRaises(TypeError):
+            new = BaseModel(**{1: 2, "id": "holberton"})
+        with self.assertRaises(TypeError):
+            new = BaseModel(**{"id": "holberton", 1: 2})
+
+    def test_kwargs_str_BaseModel(self):
+        """test if kwargs works"""
+        with self.assertRaises(TypeError):
+            new = BaseModel(**"Holberton")
 
 
 if __name__ == "__main__":
