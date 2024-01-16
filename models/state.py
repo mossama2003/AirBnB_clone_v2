@@ -19,22 +19,24 @@ class State(BaseModel, Base):
     """
 
     __tablename__ = "states"
+    name = Column(String(128), nullable=False)
     if storage_type == "db":
-        name = Column(String(128), nullable=False)
-        cities = relationship("City", backref="state", cascade="all, delete")
+        cities = relationship(
+            "City",
+            backref="state",
+            cascade="all, delete-orphan",
+        )
     else:
-        name = ""
 
         @property
         def cities(self):
             """
-            Getter attribute in case of file storage.
+            Returns the list of City instances with state_id equals
+            to the current State.id
             """
-            from models import storage
-
-            cities = storage.all(City)
-            cities_list = []
+            cities = models.storage.all(City)
+            list_cities = []
             for city in cities.values():
                 if city.state_id == self.id:
-                    cities_list.append(city)
-            return cities_list
+                    list_cities.append(city)
+            return list_cities

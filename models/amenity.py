@@ -4,6 +4,7 @@
 """
 from models.base_model import BaseModel, Base
 from sqlalchemy import Column, String, ForeignKey, Table
+import models
 from sqlalchemy.orm import relationship
 from os import getenv
 
@@ -16,27 +17,24 @@ class Amenity(BaseModel, Base):
     """
 
     __tablename__ = "amenities"
+    name = Column(String(128), nullable=False)
     if storage_type == "db":
-        name = Column(String(128), nullable=False)
         place_amenities = relationship(
-            "Place", secondary="place_amenity", viewonly=False
+            "Place",
+            secondary="place_amenity",
+            back_populates="amenities",
         )
     else:
-        name = ""
-
-    if storage_type != "db":
 
         @property
         def place_amenities(self):
             """
-            Getter attribute in case of file storage.
+            Returns the list of Amenity instances with amenity_id equals
+            to the current Amenity.id
             """
-            from models import storage
-            from models.place import Place
-
-            place_amenities = storage.all(Place)
-            place_amenities_list = []
-            for place in place_amenities.values():
-                if place.amenity_ids == self.id:
-                    place_amenities_list.append(place)
-            return place_amenities_list
+            amenities = models.storage.all(Amenity)
+            list_amenities = []
+            for amenity in amenities.values():
+                if amenity.amenity_id == self.id:
+                    list_amenities.append(amenity)
+            return list_amenities

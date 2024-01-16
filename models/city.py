@@ -4,6 +4,8 @@
 """
 from models.base_model import BaseModel, Base
 from sqlalchemy import Column, String, ForeignKey
+import models
+from models.place import Place
 from sqlalchemy.orm import relationship
 from os import getenv
 
@@ -18,24 +20,33 @@ class City(BaseModel, Base):
 
     __tablename__ = "cities"
     if storage_type == "db":
-        name = Column(String(128), nullable=False)
-        state_id = Column(String(60), ForeignKey("states.id"), nullable=False)
-        places = relationship("Place", backref="cities", cascade="all, delete")
+        state_id = Column(
+            String(60),
+            ForeignKey("states.id"),
+            nullable=False,
+        )
+        name = Column(
+            String(128),
+            nullable=False,
+        )
+        places = relationship(
+            "Place",
+            backref="cities",
+            cascade="all, delete-orphan",
+        )
     else:
-        name = ""
         state_id = ""
+        name = ""
 
         @property
         def places(self):
             """
-            Getter attribute in case of file storage.
+            Returns the list of Place instances with city_id equals
+            to the current City.id
             """
-            from models import storage
-            from models.place import Place
-
-            places = storage.all(Place)
-            places_list = []
+            places = models.storage.all(Place)
+            list_places = []
             for place in places.values():
                 if place.city_id == self.id:
-                    places_list.append(place)
-            return places_list
+                    list_places.append(place)
+            return list_places

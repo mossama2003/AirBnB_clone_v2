@@ -7,6 +7,7 @@ from models.place import Place
 from models.review import Review
 from sqlalchemy import Column, String
 from sqlalchemy.orm import relationship
+import models
 from os import getenv
 
 storage_type = getenv("HBNB_TYPE_STORAGE")
@@ -18,45 +19,57 @@ class User(BaseModel, Base):
     """
 
     __tablename__ = "users"
+    email = Column(
+        String(128),
+        nullable=False,
+    )
+    password = Column(
+        String(128),
+        nullable=False,
+    )
+    first_name = Column(
+        String(128),
+        nullable=True,
+    )
+    last_name = Column(
+        String(128),
+        nullable=True,
+    )
     if storage_type == "db":
-        email = Column(String(128), nullable=False)
-        password = Column(String(128), nullable=False)
-        first_name = Column(String(128), nullable=False)
-        last_name = Column(String(128), nullable=False)
-        places = relationship("Place", backref="user", cascade="all, delete")
-        reviews = relationship("Review", backref="user", cascade="all, delete")
+        places = relationship(
+            "Place",
+            backref="user",
+            cascade="all, delete-orphan",
+        )
+        reviews = relationship(
+            "Review",
+            backref="user",
+            cascade="all, delete-orphan",
+        )
     else:
-        email = ""
-        password = ""
-        first_name = ""
-        last_name = ""
 
         @property
         def places(self):
             """
-            Getter attribute in case of file storage.
+            Returns the list of Place instances with user_id equals
+            to the current User.id
             """
-            from models import storage
-            from models.place import Place
-
-            places = storage.all(Place)
-            places_list = []
+            places = models.storage.all(Place)
+            list_places = []
             for place in places.values():
                 if place.user_id == self.id:
-                    places_list.append(place)
-            return places_list
+                    list_places.append(place)
+            return list_places
 
         @property
         def reviews(self):
             """
-            Getter attribute in case of file storage.
+            Returns the list of Review instances with user_id equals
+            to the current User.id
             """
-            from models import storage
-            from models.review import Review
-
-            reviews = storage.all(Review)
-            reviews_list = []
+            reviews = models.storage.all(Review)
+            list_reviews = []
             for review in reviews.values():
                 if review.user_id == self.id:
-                    reviews_list.append(review)
-            return reviews_list
+                    list_reviews.append(review)
+            return list_reviews

@@ -7,6 +7,7 @@ from sqlalchemy import Column, String, ForeignKey, Integer, Float, Table
 from sqlalchemy.orm import relationship
 from models.review import Review
 from models.amenity import Amenity
+import models
 from os import getenv
 
 storage_type = getenv("HBNB_TYPE_STORAGE")
@@ -19,12 +20,14 @@ if storage_type == "db":
             "place_id",
             String(60),
             ForeignKey("places.id"),
+            primary_key=True,
             nullable=False,
         ),
         Column(
             "amenity_id",
             String(60),
             ForeignKey("amenities.id"),
+            primary_key=True,
             nullable=False,
         ),
     )
@@ -57,23 +60,23 @@ class Place(BaseModel, Base):
         )
         number_rooms = Column(
             Integer,
-            default=0,
             nullable=False,
+            default=0,
         )
         number_bathrooms = Column(
             Integer,
-            default=0,
             nullable=False,
+            default=0,
         )
         max_guest = Column(
             Integer,
-            default=0,
             nullable=False,
+            default=0,
         )
         price_by_night = Column(
             Integer,
-            default=0,
             nullable=False,
+            default=0,
         )
         latitude = Column(
             Float,
@@ -83,17 +86,17 @@ class Place(BaseModel, Base):
             Float,
             nullable=True,
         )
-        amenity_ids = []
         reviews = relationship(
             "Review",
             backref="place",
-            cascade="all, delete",
+            cascade="all, delete-orphan",
         )
         amenities = relationship(
             "Amenity",
             secondary="place_amenity",
             viewonly=False,
             back_populates="place_amenities",
+            cascade="all",
         )
     else:
         city_id = ""
@@ -110,37 +113,24 @@ class Place(BaseModel, Base):
         @property
         def reviews(self):
             """
-            Getter attribute in case of file storage.
+            Returns the list of Review instances with place_id equals
+            to the current Place.id
             """
-            from models import storage
-            from models.review import Review
-
-            reviews = storage.all(Review)
-            reviews_list = []
+            reviews = models.storage.all(Review)
+            list_reviews = []
             for review in reviews.values():
                 if review.place_id == self.id:
-                    reviews_list.append(review)
-            return reviews_list
+                    list_reviews.append(review)
+            return list_reviews
 
         @property
         def amenities(self):
             """
-            Getter attribute in case of file storage.
+            Returns the list of Amenity instances based on the attribute
+            amenity_ids that contains all Amenity.id linked to the Place
             """
-            from models import storage
-            from models.amenity import Amenity
-
-            amenities = storage.all(Amenity)
-            amenities_list = []
+            amenities = models.storage.all(Amenity)
+            list_amenities = []
             for amenity in amenities.values():
                 if amenity.id in self.amenity_ids:
-                    amenities_list.append(amenity)
-            return amenities_list
-
-        @amenities.setter
-        def amenities(self, obj):
-            """
-            Setter attribute in case of file storage.
-            """
-            if isinstance(obj, Amenity):
-                self.amenity_ids.append(obj.id)
+                    list_amenities.append(amenity)

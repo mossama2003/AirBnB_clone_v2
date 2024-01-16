@@ -16,9 +16,21 @@ class BaseModel:
     Base class for other classes to be used for the duration.
     """
 
-    id = Column(String(60), primary_key=True, nullable=False)
-    created_at = Column(DateTime, default=datetime.utcnow(), nullable=False)
-    updated_at = Column(DateTime, default=datetime.utcnow(), nullable=False)
+    id = Column(
+        String(60),
+        primary_key=True,
+        nullable=False,
+    )
+    created_at = Column(
+        DateTime,
+        nullable=False,
+        default=datetime.utcnow(),
+    )
+    updated_at = Column(
+        DateTime,
+        nullable=False,
+        default=datetime.utcnow(),
+    )
 
     def __init__(self, *args, **kwargs):
         """
@@ -33,10 +45,11 @@ class BaseModel:
                 setattr(self, key, value)
             if "id" not in kwargs.keys():
                 setattr(self, "id", str(uuid.uuid4()))
+            time = datetime.now()
             if "created_at" not in kwargs.keys():
-                setattr(self, "created_at", datetime.now())
+                setattr(self, "created_at", time)
             if "updated_at" not in kwargs.keys():
-                setattr(self, "updated_at", datetime.now())
+                setattr(self, "updated_at", time)
         else:
             self.id = str(uuid.uuid4())
             self.created_at = datetime.now()
@@ -44,17 +57,7 @@ class BaseModel:
 
     def __str__(self):
         """
-        Return string representation of BaseModel class
-        """
-        return "[{}] ({}) {}".format(
-            self.__class__.__name__,
-            self.id,
-            self.__dict__,
-        )
-
-    def __repr__(self):
-        """
-        Return string representation of BaseModel class
+        Return the print/str representation of the BaseModel class.
         """
         return "[{}] ({}) {}".format(
             self.__class__.__name__,
@@ -64,7 +67,7 @@ class BaseModel:
 
     def save(self):
         """
-        Update the updated_at attribute with new.
+        Update updated_at with the current datetime.
         """
         self.updated_at = datetime.now()
         models.storage.new(self)
@@ -72,7 +75,7 @@ class BaseModel:
 
     def to_dict(self):
         """
-        Return dictionary representation of BaseModel class.
+        Return a dictionary representation of the BaseModel class.
         """
         new_dict = self.__dict__.copy()
         new_dict["__class__"] = self.__class__.__name__
@@ -84,6 +87,12 @@ class BaseModel:
 
     def delete(self):
         """
-        Delete the current instance from the storage
+        Delete the current instance from the storage.
         """
         models.storage.delete(self)
+
+    def __repr__(self):
+        """
+        Return the string representation of the BaseModel class.
+        """
+        return self.__str__()
