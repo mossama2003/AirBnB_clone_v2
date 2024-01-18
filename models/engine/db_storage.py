@@ -37,7 +37,12 @@ class DBStorage:
     def __init__(self):
         """initialize instances"""
         self.__engine = create_engine(
-            "mysql+mysqldb://{}:{}@{}/{}".format(user, password, host, database),
+            "mysql+mysqldb://{}:{}@{}/{}".format(
+                user,
+                password,
+                host,
+                database,
+            ),
             pool_pre_ping=True,
         )
 

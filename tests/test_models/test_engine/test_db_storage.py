@@ -64,6 +64,26 @@ class TestDBStorage(unittest.TestCase):
         query_rows = self.query.fetchall()
         self.assertEqual(len(query_rows), 1)
 
+    @unittest.skipIf(getenv("HBNB_TYPE_STORAGE") != "db", "Not db storage")
+    def test_all(self):
+        """test if all works"""
+        self.query.execute("SELECT * FROM states")
+        query_rows = self.query.fetchall()
+        self.assertEqual(len(query_rows), len(self.storage.all(State)))
+
+    @unittest.skipIf(getenv("HBNB_TYPE_STORAGE") != "db", "Not db storage")
+    def test_new(self):
+        """test if new works"""
+        self.query.execute("SELECT * FROM states")
+        query_rows = self.query.fetchall()
+        self.assertEqual(len(query_rows), len(self.storage.all(State)))
+        state = State(name="California")
+        state.save()
+        self.db.autocommit(True)
+        self.query.execute("SELECT * FROM states")
+        query_rows = self.query.fetchall()
+        self.assertEqual(len(query_rows), len(self.storage.all(State)))
+
 
 if __name__ == "__main__":
     unittest.main()
