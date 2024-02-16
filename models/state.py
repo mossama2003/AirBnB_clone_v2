@@ -1,42 +1,39 @@
 #!/usr/bin/python3
-"""
-    Implementation of the State class
-"""
-from models.base_model import BaseModel, Base
+"""Defines the State class."""
+import models
 from sqlalchemy import Column, String
 from sqlalchemy.orm import relationship
+from models.base_model import BaseModel, Base
 from models.city import City
 from os import getenv
-import models
-
-
-type_of_storage = getenv("HBNB_TYPE_STORAGE")
 
 
 class State(BaseModel, Base):
-    """
-    Implementation for the State.
-    """
+    """Represents a state for a MySQL database.
 
+    Inherits from SQLAlchemy Base and links to the MySQL table states.
+
+    Attributes:
+        __tablename__ (str): The name of the MySQL table to store States.
+        name (sqlalchemy String): The name of the State.
+        cities (sqlalchemy relationship): The State-City relationship.
+    """
     __tablename__ = "states"
     name = Column(String(128), nullable=False)
-    if type_of_storage == "db":
-        cities = relationship(
-            "City",
-            backref="state",
-            cascade="all, delete-orphan",
-        )
-    else:
 
+    if getenv("HBNB_TYPE_STORAGE") == "db":
+        cities = relationship("City", backref="state", cascade="all, delete")
+    else:
         @property
         def cities(self):
+            """Get a list of City instances with
+                state_id equals to the current State.id.
+
+            This is a getter attribute for FileStorage
+                relationship between State and City.
             """
-            Returns the list of City instances with state_id equals
-            to the current State.id
-            """
-            cities = models.storage.all(City)
-            cities_lista = []
-            for city in cities.values():
+            city_list = []
+            for city in models.storage.all(City).values():
                 if city.state_id == self.id:
-                    cities_lista.append(city)
-            return cities_lista
+                    city_list.append(city)
+            return city_list
